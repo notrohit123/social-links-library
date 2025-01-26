@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Links Kanban</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-container,
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        button {
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .platform-column {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 300px;
+        }
+        .platform-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .link-card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .link-card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .link-card a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .link-card a:hover {
+            text-decoration: underline;
+        }
+        .priority-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .priority-urgent {
+            background: #ff4d4f;
+        }
+        .priority-high {
+            background: #1890ff;
+        }
+        .priority-medium {
+            background: #52c41a;
+        }
+        .priority-low {
+            background: #faad14;
+        }
+        .menu-dots {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #888;
+        }
+        .menu-options {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 10px;
+    background: white;
+    border: 1px solid #ccc; /* Added a visible border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    z-index: 1000;
+    padding: 5px; /* Added padding for spacing */
+    color: #333; /* Ensure text is visible */
+}
+.menu-options button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    color: #333; /* Ensure button text is visible */
+    font-size: 14px;
+}
+.menu-options button:hover {
+    background: #f1f1f1;
+}
+
+    </style>
+</head>
+<body>
+    <h1>📌 Social Links Kanban</h1>
+
+    <div class="form-container">
+        <input id="url" placeholder="Paste link here" required>
+        <input id="caption" placeholder="Caption (optional)">
+        <select id="tags">
+            <option value="informative">Informative</option>
+            <option value="tech">Tech</option>
+            <option value="funny">Funny</option>
+        </select>
+        <select id="importance">
+            <option value="1">🔴 Urgent</option>
+            <option value="2">🔵 High Priority</option>
+            <option value="3">🟢 Medium Priority</option>
+            <option value="4">🟠 Low Priority</option>
+        </select>
+        <button onclick="addLink()">Add Link</button>
+    </div>
+
+    <div class="filter-container">
+        <select id="filter-platform">
+            <option value="">All Platforms</option>
+            <option value="twitter">Twitter</option>
+            <option value="reddit">Reddit</option>
+            <option value="youtube">YouTube</option>
+            <option value="instagram">Instagram</option>
+        </select>
+        <select id="filter-tags">
+            <option value="">All Tags</option>
+            <option value="informative">Informative</option>
+            <option value="tech">Tech</option>
+            <option value="funny">Funny</option>
+        </select>
+        <select id="filter-priority">
+            <option value="">All Priorities</option>
+            <option value="1">Urgent</option>
+            <option value="2">High Priority</option>
+            <option value="3">Medium Priority</option>
+            <option value="4">Low Priority</option>
+        </select>
+        <button onclick="applyFilters()">Apply Filters</button>
+        <button onclick="resetFilters()">Reset Filters</button>
+    </div>
+
+    <div class="kanban-board">
+        <div id="twitterColumn" class="platform-column">
+            <h2 class="platform-header">🐦 Twitter</h2>
+        </div>
+        <div id="redditColumn" class="platform-column">
+            <h2 class="platform-header">📌 Reddit</h2>
+        </div>
+        <div id="youtubeColumn" class="platform-column">
+            <h2 class="platform-header">▶️ YouTube</h2>
+        </div>
+        <div id="instagramColumn" class="platform-column">
+            <h2 class="platform-header">📸 Instagram</h2>
+        </div>
+    </div>
+
+    <script>
+        async function addLink() {
+            const link = {
+                url: document.getElementById('url').value,
+                caption: document.getElementById('caption').value,
+                tags: document.getElementById('tags').value,
+                importance: parseInt(document.getElementById('importance').value),
+            };
+
+            const response = await fetch('http://127.0.0.1:8000/add-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(link),
+            });
+
+            if (response.ok) {
+                loadLinks();
+            } else {
+                alert('Failed to add link!');
+            }
+        }
+
+        async function applyFilters() {
+            const platform = document.getElementById('filter-platform').value || "";
+            const tags = document.getElementById('filter-tags').value || "";
+            const priority = document.getElementById('filter-priority').value || "";
+
+            const query = new URLSearchParams({
+                platform,
+                tag: tags,
+                priority
+            }).toString();
+
+            const response = await fetch(`http://127.0.0.1:8000/get-links?${query}`);
+            if (response.ok) {
+                const data = await response.json();
+                renderLinks(data.results);
+            } else {
+                alert("Error applying filters.");
+            }
+        }
+
+        async function resetFilters() {
+            document.getElementById('filter-platform').value = '';
+            document.getElementById('filter-tags').value = '';
+            document.getElementById('filter-priority').value = '';
+            loadLinks();
+        }
+
+        async function loadLinks() {
+            const response = await fetch('http://127.0.0.1:8000/get-links');
+            const data = await response.json();
+            renderLinks(data.results);
+        }
+
+        function renderLinks(links) {
+            const platforms = ['twitter', 'reddit', 'youtube', 'instagram'];
+            platforms.forEach(platform => {
+                const column = document.getElementById(`${platform}Column`);
+                column.innerHTML = `<h2 class="platform-header">${platform.toUpperCase()}</h2>`;
+            });
+
+            links.forEach(link => {
+                const column = document.getElementById(`${link.platform}Column`);
+                column.innerHTML += `
+                    <div class="link-card">
+                        <button class="menu-dots" onclick="toggleMenu(this)">⋮</button>
+                        <div class="menu-options">
+                            <button onclick="deleteLink(${link.id})">Delete</button>
+                            <button onclick="renameLink(${link.id}, '${link.caption}', '${link.tags}', ${link.importance})">Rename</button>
+                        </div>
+                        <p><span class="priority-dot ${getPriorityClass(link.importance)}"></span>${link.caption}</p>
+                        <p><strong>Tags:</strong> ${link.tags}</p>
+                        <p><a href="${link.url}" target="_blank">${link.url}</a></p>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleMenu(button) {
+            const menu = button.nextElementSibling;
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
+
+        async function deleteLink(id) {
+            const response = await fetch(`http://127.0.0.1:8000/delete-link/${id}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                loadLinks();
+            } else {
+                alert('Failed to delete link.');
+            }
+        }
+
+        function renameLink(id, currentCaption, currentTags, currentImportance) {
+            const newCaption = prompt("Enter new caption:", currentCaption);
+            const newTags = prompt("Enter new tags:", currentTags);
+            const newImportance = parseInt(prompt("Enter new priority (1-4):", currentImportance));
+
+            if (newCaption && newTags && newImportance) {
+                fetch('http://127.0.0.1:8000/rename-link', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, new_caption: newCaption, new_tags: newTags, new_importance: newImportance }),
+                }).then(response => {
+                    if (response.ok) {
+                        loadLinks();
+                    } else {
+                        alert('Failed to rename link.');
+                    }
+                });
+            }
+        }
+
+        function getPriorityClass(priority) {
+            return ['priority-urgent', 'priority-high', 'priority-medium', 'priority-low'][priority - 1];
+        }
+
+        loadLinks();
+    </script>
+</body>
+</html>

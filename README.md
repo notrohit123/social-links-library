@@ -30,40 +30,46 @@ social-library/
 ├── social_library.db    # SQLite database (optional)
 └── README.md            # Project documentation
 
-
+`
 🚀 Getting Started
 
 1. Clone the Repository
 
-git clone https://github.com/your-username/social-library.git
+``` bash
+git clone https://github.com/your-username/social-library.git `
 cd social-library
+```
 
+---------------
 
 2. Set Up the Backend
 Install Python Dependencies
 
 Make sure you have Python installed. Then, run:
-
-
+``` bash
 pip install -r requirements.txt
-
+```
 
 Start the Server
 
 Run the FastAPI server:
 
+``` bash
 uvicorn backend.main:app --reload
-
+```
 
 Visit http://127.0.0.1:8000/docs to explore the API.
 
+
+----------------------
 
 3. Set Up the Frontend
 
 Simply open the frontend/index.html file in your browser:
 
+```bash
 frontend/index.html
-
+```
 
 
 

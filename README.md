@@ -37,7 +37,7 @@ social-library/
 
 ``` bash
 git clone https://github.com/your-username/social-library.git `
-cd social-library
+cd <folder-name>
 ```
 
 ---------------
@@ -49,6 +49,8 @@ Make sure you have Python installed. Then, run:
 ``` bash
 pip install -r requirements.txt
 ```
+
+Once you install it,
 
 Start the Server
 
